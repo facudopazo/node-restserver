@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 const app = express();
 const Usuario = require('../models/usuario');
+const { validateToken, verifyAdmin_Role } = require('../middlewares/authentication');
 
-app.get("/usuario", (req, res) => {
+app.get("/usuario", validateToken, (req, res) => {
     let id = req.params.id;
     let base = req.query.base || 0;
     let range = req.query.range || 5;
@@ -36,7 +37,7 @@ app.get("/usuario", (req, res) => {
 
 })
 
-app.post("/usuario", (req, res) => {
+app.post("/usuario", [validateToken, verifyAdmin_Role], (req, res) => {
     let body = req.body;
 
     let usuario = new Usuario({
@@ -62,7 +63,7 @@ app.post("/usuario", (req, res) => {
     })
 })
 
-app.put("/usuario/:id", (req, res) => {
+app.put("/usuario/:id", [validateToken, verifyAdmin_Role], (req, res) => {
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado'])
 
     let id = req.params.id
@@ -80,7 +81,7 @@ app.put("/usuario/:id", (req, res) => {
     })
 })
 
-app.delete("/usuario/:id", (req, res) => {
+app.delete("/usuario/:id", [validateToken, verifyAdmin_Role], (req, res) => {
     let id = req.params.id
     // let body = _.pick(req.body, ['estado'])
     let disabledUSer = {
